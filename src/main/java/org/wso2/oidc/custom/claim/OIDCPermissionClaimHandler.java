@@ -58,8 +58,7 @@ public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler
 
     @Override
     public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder,
-                                           OAuthTokenReqMessageContext tokenReqMessageContext)
-            throws IdentityOAuth2Exception {
+                                           OAuthTokenReqMessageContext tokenReqMessageContext) {
 
         if (log.isDebugEnabled()) {
             log.debug("Handling custom claims in OAuth token request.");
@@ -86,8 +85,7 @@ public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler
 
     @Override
     public JWTClaimsSet handleCustomClaims(JWTClaimsSet.Builder jwtClaimsSetBuilder,
-                                           OAuthAuthzReqMessageContext authzReqMessageContext)
-            throws IdentityOAuth2Exception {
+                                           OAuthAuthzReqMessageContext authzReqMessageContext) {
 
         if (log.isDebugEnabled()) {
             log.debug("Handling custom claims in Authorization request.");
