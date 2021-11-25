@@ -25,6 +25,7 @@ claim_callback_handler="org.wso2.oidc.custom.claim.OIDCPermissionClaimHandler"
    3. Or you can retrieve all permissions assigned to a particular user identity by defining the Claim URI as 'http://wso2.org/claims/permission'.
 
 More information about adding a local claim can be found here: https://is.docs.wso2.com/en/latest/learn/adding-claim-mapping/#add-local-claim.
+
 5. Create an External Claim that is mapped to the local claim that was created in Step 2.
    1. Go to ```Claims``` section in the management console, click ```Add``` and then ```Add External Claim``` option.
    2. Select ```http://wso2.org/oidc/claim``` as the Dialect URI, provide a desired name for External Claim URI field and select the local claim URI that was created in Step 4.
