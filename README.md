@@ -1,6 +1,6 @@
 # Custom OIDC Permission Claim Handler
 
-This is a custom claim permission handler that is built to work with the /oauth2/token endpoint as opposed to the recommended /oauth2/authorize endpoint.
+This is a custom claim permission handler for WSO2 Identity Server that is built to work with the /oauth2/token endpoint as opposed to the recommended /oauth2/authorize endpoint.
 
 An advantage of this custom handler is that redirection is not required, since it used the ```password``` grant type and the /oauth2/token endpoint.
 
