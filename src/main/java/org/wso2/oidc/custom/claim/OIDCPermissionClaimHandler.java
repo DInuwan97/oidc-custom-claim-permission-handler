@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
+import org.wso2.carbon.identity.application.common.model.ApplicationPermission;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
@@ -125,8 +126,9 @@ public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler
                 }
             }
 
+
             Map<String, List<String>> permissionList =
-                    createPermissionStructure(userClaimsInOidcDialect, userName, realm);
+                    createPermissionStructure(userClaimsInOidcDialect, userName, realm, spTenantDomain, clientId);
 
             if (!permissionList.isEmpty()) {
                 jwtClaimsSetBuilder.claim("permissions", permissionList);
@@ -212,12 +214,16 @@ public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler
     }
 
     private Map<String, List<String>> createPermissionStructure(List<String> userClaimsInOidcDialect, String userName,
-                                                                UserRealm realm) {
+                                                                UserRealm realm, String spTenantDomain, String clientId) {
 
         Map<String, List<String>> permissionList = new HashMap<>();
 
         try {
             AuthorizationManager authorizationManager = realm.getAuthorizationManager();
+
+            ServiceProvider serviceProvider = getServiceProvider(spTenantDomain, clientId);
+            ApplicationPermission[] applicationPermission = serviceProvider.getPermissionAndRoleConfig().getPermissions();
+
 
             for (String claimUri : userClaimsInOidcDialect) {
                 if (claimUri.contains(PERMISSION_CLAIM)) {
@@ -226,6 +232,7 @@ public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler
                     if (log.isDebugEnabled()) {
                         log.debug("Retrieving permissions for " + permissionRootPath);
                     }
+
                     String[] permissions = authorizationManager
                             .getAllowedUIResourcesForUser(MultitenantUtils.getTenantAwareUsername(userName),
                                     permissionRootPath);
@@ -239,15 +246,19 @@ public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler
                             log.debug("Retrieved permission list for " + permissionRootPath + ": " +
                                     Arrays.asList(permissions));
                         }
-                        for (String permission : permissions) {
-                            leafPermission.add(getPermissionLeaf(permissionRootPath, permission));
+
+                        for (ApplicationPermission spPermission : applicationPermission) {
+                            leafPermission.add(getPermissionLeaf(permissionRootPath, spPermission.getValue()));
                         }
                         permissionList.put(permissionRootPath, new ArrayList<>(leafPermission));
+
                     }
                 }
             }
         } catch (UserStoreException e) {
             log.error("Error while retrieving user claim in local dialect for user: " + userName, e);
+        } catch (IdentityApplicationManagementException e) {
+            throw new RuntimeException(e);
         }
         return permissionList;
     }
@@ -260,4 +271,5 @@ public class OIDCPermissionClaimHandler extends DefaultOIDCClaimsCallbackHandler
         }
         return permission;
     }
+
 }
